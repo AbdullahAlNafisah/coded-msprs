@@ -1,0 +1,31 @@
+{
+ "eb_no_db": 7.25,
+ "es_no_db": 4.24,
+ "n_frames": 400002,
+ "ers_cnt": 347,
+ "ber": 1.736e-07,
+ "duration_s": 308.2,
+ "bits_cnt": 1999209996,
+ "ber_lo95": 1.5578458599891585e-07,
+ "ber_ub95": 1.9282636407726066e-07,
+ "is_upper_bound": false,
+ "timestamp": "2026-08-17T12:07:12+00:00",
+ "config": {
+  "implementation": "aff3ct-4.1.2",
+  "scheme": "coded-bpsk",
+  "L0": 3,
+  "filter_type": "unbalanced",
+  "source_bits": 4998,
+  "K": 3,
+  "octal_code": [
+   5,
+   7
+  ],
+  "max_iters": 7,
+  "interleaver_seed": 42,
+  "be_target": 8000,
+  "min_fra": 4000,
+  "threads": 6,
+  "metric_convention": "llr-2sigma2-2026-08-10"
+ }
+}

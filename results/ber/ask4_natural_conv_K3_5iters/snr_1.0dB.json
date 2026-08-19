@@ -1,0 +1,26 @@
+{
+  "eb_no_db": 1.0,
+  "ber": 0.17112979855283758,
+  "bits_cnt": 2004198,
+  "ers_cnt": 342978,
+  "duration_s": 18.36,
+  "timestamp": "2026-04-25 20:24:21",
+  "config": {
+    "source_bits": 4998,
+    "bts_max": 2000000,
+    "ber_min": 1e-06,
+    "ers_min": 100,
+    "ers_tol": 0.01,
+    "avg_bit_energy": 0.5,
+    "gray": false,
+    "coder": {
+      "K": 3,
+      "octal_code": [
+        5,
+        7
+      ]
+    },
+    "max_iters": 5,
+    "interleaver_seed": 42
+  }
+}

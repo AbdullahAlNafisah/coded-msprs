@@ -1,0 +1,17 @@
+{
+  "eb_no_db": 7.0,
+  "ber": 0.05254080816163233,
+  "bits_cnt": 9998000,
+  "ers_cnt": 525303,
+  "duration_s": 5.13,
+  "timestamp": "2026-05-16 21:00:32",
+  "config": {
+    "source_bits": 9998,
+    "bts_max": 9998000,
+    "ber_min": 1e-05,
+    "ers_min": 100,
+    "ers_tol": 0.001,
+    "L0": 3,
+    "filter_type": "balanced"
+  }
+}

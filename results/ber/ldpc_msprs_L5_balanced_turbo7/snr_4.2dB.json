@@ -1,0 +1,28 @@
+{
+ "eb_no_db": 4.25,
+ "es_no_db": 4.25,
+ "n_frames": 2000,
+ "ers_cnt": 1000364,
+ "ber": 0.125,
+ "duration_s": 72.2,
+ "bits_cnt": 8000000,
+ "ber_lo95": 0.12481636516435021,
+ "ber_ub95": 0.1252749062420754,
+ "is_upper_bound": false,
+ "timestamp": "2026-08-17T16:06:38+00:00",
+ "config": {
+  "implementation": "aff3ct-4.1.2",
+  "scheme": "ldpc-msprs",
+  "L0": 5,
+  "filter_type": "balanced",
+  "source_bits": 4000,
+  "outer_code": "LDPC MACKAY_4000_8000, rate 1/2",
+  "bp_ite": 20,
+  "max_iters": 7,
+  "interleaver_seed": 42,
+  "be_target": 3000,
+  "min_fra": 2000,
+  "threads": 5,
+  "metric_convention": "llr-2sigma2-2026-08-10"
+ }
+}

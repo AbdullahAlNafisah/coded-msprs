@@ -1,0 +1,33 @@
+{
+  "eb_no_db": 1.0,
+  "ber": 0.1385234093637455,
+  "bits_cnt": 999600,
+  "ers_cnt": 138468,
+  "ers_per_iter": [
+    144807,
+    138834,
+    138495,
+    138462,
+    138460,
+    138475,
+    138469,
+    138468
+  ],
+  "duration_s": 9.42,
+  "timestamp": "2026-06-02 03:28:37",
+  "config": {
+    "source_bits": 4998,
+    "avg_bit_energy": 0.5,
+    "coder": {
+      "K": 3,
+      "octal_code": [
+        5,
+        7
+      ]
+    },
+    "max_iters": 7,
+    "interleaver_seed": 42,
+    "scheme": "ask4_gray",
+    "n_packets": 200
+  }
+}

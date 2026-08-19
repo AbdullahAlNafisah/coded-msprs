@@ -1,0 +1,38 @@
+{
+ "eb_no_db": 4.0,
+ "es_no_db": 4.0,
+ "n_frames": 2000,
+ "ers_cnt": 10082,
+ "ber": 0.001009,
+ "duration_s": 60.7,
+ "bits_cnt": 9996000,
+ "ers_per_iter": [
+  1420945,
+  496449,
+  104870,
+  21910,
+  11879,
+  10386,
+  10177,
+  10082
+ ],
+ "timestamp": "2026-08-16T19:18:02+00:00",
+ "config": {
+  "implementation": "aff3ct-4.1.2",
+  "scheme": "coded-msprs",
+  "L0": 4,
+  "filter_type": "unbalanced",
+  "source_bits": 4998,
+  "K": 3,
+  "octal_code": [
+   5,
+   7
+  ],
+  "max_iters": 7,
+  "interleaver_seed": 42,
+  "be_target": 3000,
+  "min_fra": 2000,
+  "threads": 4,
+  "metric_convention": "llr-2sigma2-2026-08-10"
+ }
+}

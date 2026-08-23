@@ -1,0 +1,41 @@
+name: reproduce
+
+# Proves this artifact's central claim on every push: the figures regenerate
+# from the cached results without rerunning any simulation.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  figures:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install the exact environment the results were verified in
+        run: pip install -r requirements-lock.txt
+
+      - name: Install the package
+        run: pip install -e . --no-deps
+
+      - name: Regenerate the figures from the cached results
+        run: |
+          python scripts/make_exit_figure.py
+          python scripts/make_ber_overview.py
+          python scripts/make_ber_convergence.py
+          python scripts/render_amplitude_grid.py
+
+      - name: Verify the reported claims against the caches
+        run: python scripts/verify_paper_claims.py
+
+      - name: Upload the regenerated figures
+        uses: actions/upload-artifact@v4
+        with:
+          name: figures
+          path: figures/

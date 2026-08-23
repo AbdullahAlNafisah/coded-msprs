@@ -11,7 +11,7 @@
  * systematic equivalent generate the *same codeword set*, hence the same FER,
  * but a different information-to-codeword mapping, hence a different BER and a
  * different EXIT curve. That would invalidate every cache under
- * notebooks/BER/outputs/ and every margin quoted in the manuscript.
+ * results/ber/ and every margin quoted in the manuscript.
  *
  * Conventions match AFF3CT throughout: LLR is `ln P(b=0)/P(b=1)`, positive
  * means bit 0.

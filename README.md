@@ -11,6 +11,18 @@ bipolar sub-streams, rather than by compressing the symbol period as
 faster-than-Nyquist signaling does. The rate-2 case carries two bits per channel
 use, the spectral efficiency of 4-ASK on one quadrature.
 
+The MS-PRS scheme itself, its filter tap families and their MSED optimisation
+are due to Siala, Al-Nafisah and Al-Naffouri, *Nyquist Signaling Modulation
+(NSM): An FTN-Inspired Paradigm Shift in Modulation Design for 6G and Beyond*,
+[arXiv:2511.08553](https://arxiv.org/abs/2511.08553). This repository
+accompanies a paper contributing the coded turbo-equalized receiver, its EXIT
+convergence analysis and the simulated coded BER. Please cite the paper rather
+than the code; `CITATION.cff` carries both.
+
+It is a **reproducibility artifact**, not a library. Issues reporting a
+reproduction failure are welcome. It is not accepting feature contributions,
+and no API stability is promised.
+
 The receiver is a turbo loop: a BCJR equalizer on the `2^(L0-1)`-state MS-PRS
 trellis exchanges extrinsic log-likelihood ratios with an outer SISO decoder,
 either a rate-1/2 convolutional code or a rate-1/2 LDPC code.
@@ -26,7 +38,12 @@ results/
   exit/       12 EXIT characteristic caches
 nsm/          Python reference implementation and the filter tap tables
 scripts/      figure rendering, cache generation, analysis
+figures/      the rendered figures, so results are visible without a run
+tutorials/    eight teaching notebooks, from interleavers to filter families
 ```
+
+The published package is simulation-only. The hardware and over-the-air layer
+of the wider project is deliberately not part of this artifact.
 
 ## Building the simulator
 
@@ -59,7 +76,7 @@ modulator, both BCJRs and the encoder agree to better than 1e-6.
 ## Reproducing the figures
 
 ```
-pip install numpy scipy numba matplotlib
+pip install -e .
 python scripts/make_exit_figure.py       # modem and decoder EXIT characteristics
 python scripts/make_ber_overview.py      # coded BER, both energy families
 python scripts/make_ber_convergence.py   # BER against turbo iteration index
@@ -121,5 +138,8 @@ Ungerboeck observation model with noise covariance `sigma^2 * G`.
 ## Author
 
 Abdullah Al-Nafisah, King Abdullah University of Science and Technology.
+
+The modulation scheme is due to Mohamed Siala, Abdullah Al-Nafisah and Tareq
+Al-Naffouri; see the preferred citation in `CITATION.cff`.
 
 Licensed under Apache 2.0. AFF3CT is a separate project under the MIT licence.

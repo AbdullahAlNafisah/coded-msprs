@@ -2,7 +2,7 @@
  * \file main.cpp
  * \brief BER driver for the AFF3CT MS-PRS chain.
  *
- * Three modes, each with a Python cache under notebooks/BER/outputs/ to match:
+ * Three modes, each with a Python cache under results/ber/ to match:
  *
  *   uncoded-msprs  Source -> MSPRS -> AWGN -> MSPRS -> hard
  *                  ref: nsm_L{L0}_{family}_uncoded

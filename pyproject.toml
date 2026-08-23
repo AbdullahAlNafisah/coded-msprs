@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nsm"
+version = "1.1.0"
+description = "Turbo-equalized rate-2 Multi-Stream Partial Response Signaling"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Abdullah Al-Nafisah" }]
+dependencies = [
+    "numpy>=1.24",
+    "numba>=0.58",
+    "scipy>=1.10",
+    "scikit-commpy>=0.8",
+    "matplotlib>=3.7",
+]
+
+[project.urls]
+Repository = "https://github.com/AbdullahAlNafisah/coded-msprs"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["nsm*"]
+
+# msprs.py resolves the tap tables relative to __file__, so a non-editable
+# install without this ships a package where every MS-PRS entry point raises.
+[tool.setuptools.package-data]
+nsm = ["modem/filters/*.json"]

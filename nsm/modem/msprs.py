@@ -41,7 +41,7 @@ def load_coefficients(L0, filter_type="unbalanced"):
 
     # Defensive: the JSON convention stores unit-norm h0 and h1. Trip loudly
     # if a bad entry slips in (e.g. the balanced L0=9, L0=10 anomalies
-    # surfaced in Paper/FILTER_TABLE_VERIFICATION.md §7). atol=1e-6 is
+    # surfaced in the filter-table verification report §7). atol=1e-6 is
     # wide enough that 7-digit JSON truncation noise passes; only genuine
     # transcription / re-export bugs trip the assertion.
     n0_sq = float(np.sum(h0 ** 2))

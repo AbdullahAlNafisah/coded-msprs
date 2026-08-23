@@ -1,6 +1,9 @@
 cff-version: 1.2.0
 title: "coded-msprs: turbo-equalized rate-2 Multi-Stream Partial Response Signaling"
-message: "If you use this software, please cite it as below."
+message: >-
+  If you use this software, please cite the paper it accompanies
+  (see preferred-citation below). To cite the software itself, use the
+  metadata in this file.
 type: software
 authors:
   - family-names: Al-Nafisah
@@ -19,3 +22,20 @@ keywords:
   - EXIT charts
   - BCJR algorithm
   - LDPC codes
+preferred-citation:
+  type: article
+  title: >-
+    Nyquist Signaling Modulation (NSM): An FTN-Inspired Paradigm Shift in
+    Modulation Design for 6G and Beyond
+  authors:
+    - family-names: Siala
+      given-names: Mohamed
+    - family-names: Al-Nafisah
+      given-names: Abdullah
+    - family-names: Al-Naffouri
+      given-names: Tareq
+  year: 2025
+  url: "https://arxiv.org/abs/2511.08553"
+  identifiers:
+    - type: other
+      value: "arXiv:2511.08553"

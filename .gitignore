@@ -1,6 +1,11 @@
 __pycache__/
 *.pyc
+*.nbi
+*.nbc
 build/
+dist/
+*.egg-info/
 .venv/
-*.pdf
-*.png
+
+# figures/ is generated output, but the rendered figures under it are tracked
+# deliberately: the artifact should show its results without being run.

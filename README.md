@@ -34,7 +34,7 @@ cpp/          C++ simulation chain (AFF3CT v4.1.2)
   include/MSPRS/   Modem_MSPRS, Modem_FTN, NSC encoder/decoder, EXIT kernels
   src/main.cpp     multi-mode driver
 results/
-  ber/        414 simulated BER points, one JSON per scheme per Eb/N0
+  ber/        399 simulated BER points, one JSON per scheme per Eb/N0
   exit/       12 EXIT characteristic caches
 nsm/          Python reference implementation and the filter tap tables
 scripts/      figure rendering, cache generation, analysis

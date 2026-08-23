@@ -27,6 +27,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
+from nsm.curves import load_curve
 
 ROOT    = Path(__file__).resolve().parents[1]
 OUT     = ROOT / "results" / "ber"
@@ -40,14 +41,11 @@ TOL_REL     = 0.04   #: BER values are quoted to 2 significant figures, so half
 
 
 def curve(subdir: str) -> list[tuple[float, float, int]]:
-    pts = []
-    for f in glob.glob(str(OUT / subdir / "snr_*.json")):
-        j = json.load(open(f))
-        if j["ers_cnt"] >= MIN_EVENTS and j["ber"] > 0:
-            pts.append((j["eb_no_db"], j["ber"], j["ers_cnt"]))
-    if not pts:
+    c = load_curve(subdir)
+    if c is None:
         raise SystemExit(f"no usable points in {subdir} (>= {MIN_EVENTS} error events)")
-    return sorted(pts)
+    return list(zip(c.eb_no_db.tolist(), c.ber.tolist(),
+                    [int(e) for e in c.error_events]))
 
 
 def crossing(pts, target: float = TARGET) -> float:

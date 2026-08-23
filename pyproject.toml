@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nsm"
-version = "1.1.0"
+version = "1.2.0"
 description = "Turbo-equalized rate-2 Multi-Stream Partial Response Signaling"
 readme = "README.md"
 requires-python = ">=3.9"

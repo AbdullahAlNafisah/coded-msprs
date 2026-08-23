@@ -11,6 +11,7 @@
     "ber_min": 1e-07,
     "ers_min": 100,
     "ers_tol": 0.0001,
-    "avg_bit_energy": 1.0
+    "avg_bit_energy": 1.0,
+    "metric_convention": "llr-2sigma2-2026-08-10"
   }
 }

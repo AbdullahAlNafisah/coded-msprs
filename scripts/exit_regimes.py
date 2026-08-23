@@ -40,6 +40,7 @@ import glob
 import json
 import sys
 from pathlib import Path
+from nsm.curves import load_curve
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -57,8 +58,12 @@ def exit_ends(L0: int, family: str, snr: str):
 
 
 def ber_at(subdir: str, ebn0: float):
-    for f in glob.glob(str(BER / subdir / f"snr_{ebn0:.1f}*dB.json")):
-        return json.load(open(f))["ber"]
+    c = load_curve(subdir)
+    if c is None:
+        return None
+    for eb, ber in zip(c.eb_no_db.tolist(), c.ber.tolist()):
+        if abs(eb - ebn0) < 0.05:
+            return float(ber)
     return None
 
 

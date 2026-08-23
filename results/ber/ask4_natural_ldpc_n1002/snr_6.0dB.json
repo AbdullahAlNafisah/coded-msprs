@@ -4,5 +4,8 @@
   "bits_cnt": 199691,
   "ers_cnt": 206,
   "duration_s": 128.19,
-  "timestamp": "2026-04-26 14:47:45"
+  "timestamp": "2026-04-26 14:47:45",
+  "config": {
+    "metric_convention": "llr-2sigma2-2026-08-10"
+  }
 }

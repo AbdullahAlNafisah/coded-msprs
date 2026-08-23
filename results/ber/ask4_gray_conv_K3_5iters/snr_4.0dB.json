@@ -21,6 +21,7 @@
       ]
     },
     "max_iters": 5,
-    "interleaver_seed": 42
+    "interleaver_seed": 42,
+    "metric_convention": "llr-2sigma2-2026-08-10"
   }
 }

@@ -43,6 +43,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from nsm.utils.plotting_style import apply_style
+from nsm.curves import load_curve
 apply_style()
 
 FIG_DIR = ROOT / "figures"
@@ -71,16 +72,17 @@ COLUMNS = [ASK4_COLUMN] + [_msprs_column(L0) for L0 in L0_COLUMNS]
 
 def _load_curves(subdir: str):
     """Return {eb_no_db: ber_per_iter[]} for the picked Eb/N0 points."""
+    curve = load_curve(subdir)
+    if curve is None or curve.ers_per_iter is None:
+        return {}
     out = {}
-    for p in sorted((SIM_DIR / subdir).glob("snr_*.json")):
-        d = json.loads(p.read_text())
-        eb = float(d["eb_no_db"])
+    for eb, per_iter, bits in zip(curve.eb_no_db, curve.ers_per_iter, curve.bit_count):
+        eb = float(eb)
         if eb not in EB_NO_PICK_DB:
             continue
-        ers = np.asarray(d["ers_per_iter"], dtype=float)
-        bits = float(d["bits_cnt"])
+        ers = np.asarray(per_iter, dtype=float)
         # Half-error floor so a zero count stays on the log axis.
-        out[eb] = np.where(ers > 0, ers / bits, 0.5 / bits)
+        out[eb] = np.where(ers > 0, ers / float(bits), 0.5 / float(bits))
     return out
 
 

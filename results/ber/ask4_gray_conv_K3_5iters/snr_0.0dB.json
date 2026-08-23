@@ -26,6 +26,7 @@
     "max_iters": 5,
     "interleaver_seed": 42,
     "scheme": "ask4_gray",
-    "n_packets": 200
+    "n_packets": 200,
+    "metric_convention": "llr-2sigma2-2026-08-10"
   }
 }

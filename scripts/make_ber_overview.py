@@ -47,9 +47,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 
-from nsm.bounds import clopper_pearson
+from nsm.curves import load_curve
 from nsm.modem.ask2 import ber_theory as ask2_theory
-from nsm.provenance import verify
 from nsm.modem.ask4 import ber_theory as ask4_theory
 from nsm.utils.plotting_style import apply_style, plot_theory, set_paper_dims, style_for
 
@@ -69,87 +68,10 @@ _FAMILY_RAMP = {"balanced": plt.get_cmap("Blues"),
                 "unbalanced": plt.get_cmap("Oranges")}
 _RAMP_T = {3: 0.95, 4: 0.78, 5: 0.62, 6: 0.46}   # darkest = smallest L0
 
-# A real coded waterfall is non-increasing in Eb/N0; flag a genuine inversion
-# (a > MONO_TOL× rise between adjacent points), but ONLY where both points are
-# above RELIABLE_BER. Below that floor a curve is dominated by single-error
-# Poisson noise — an isolated 0-then-1-error tail (e.g. BER 0 → 1e-7) is
-# expected and must not disqualify an otherwise-clean waterfall.
-MONO_TOL = 1.5
-RELIABLE_BER = 1e-5
-# A tail point is plotted only if it rests on >= MIN_ERRS error events; below
-# that it is Poisson noise. Turbo-MC below ~1e-6 cannot be sampled deeper for
-# the high-L0 configs (L6 ~ 5 kbit/s => 100 errors at 8 dB would take weeks),
-# so unreliable tail points are dropped rather than drawn as fake precision.
-MIN_ERRS = 30
-
-
 def _family_colour(family: str, L0: int):
     return _FAMILY_RAMP[family](_RAMP_T[L0])
 
 
-def _load(subdir: str):
-    """Return ``(eb, ber, errs, bits)`` float arrays from a cache dir, or ``None``."""
-    d = OUT / subdir
-    if not d.exists():
-        return None
-    rows = []
-    for p in sorted(d.glob("snr_*.json")):
-        try:
-            r = json.loads(p.read_text())
-        except Exception:
-            continue
-        if "eb_no_db" in r and "ber" in r:
-            rows.append(r)
-    if not rows:
-        return None
-    # Check EVERY point, not one representative: a directory can hold a mix of
-    # pre- and post-fix snr_*.json files.
-    verify({f"{subdir}@{r['eb_no_db']}dB": r.get("config") for r in rows})
-    rows.sort(key=lambda r: r["eb_no_db"])
-    eb = np.array([r["eb_no_db"] for r in rows], dtype=float)
-    ber = np.array([r["ber"] for r in rows], dtype=float)
-    errs = np.array([r.get("ers_cnt", r.get("n_errs", 10**9)) for r in rows],
-                    dtype=float)
-    bits = np.array([r.get("bits_cnt", r.get("n_bits", 0)) for r in rows],
-                    dtype=float)
-    return eb, ber, errs, bits
-
-
-def _sane(name: str, data):
-    """Sanity-gate a loaded curve; return ``(eb, ber_clamped)`` or ``None``.
-
-    A curve is skipped (with a printed warning naming it) when the cache is
-    missing, any BER point exceeds 0.5, or the BER rises by more than
-    ``MONO_TOL``× between adjacent SNR points within the reliable region
-    (both points above ``RELIABLE_BER``). Unmeasured tail points (zero or
-    non-finite BER, e.g. a reference that collected 0 errors) are dropped
-    rather than clamped to a fake floor, so they cannot masquerade as a
-    plateau at the bottom of the axis.
-    """
-    if data is None:
-        print(f"  skip {name}  (no cache)")
-        return None
-    eb, ber, errs, bits = data
-    # Drop tail points with < MIN_ERRS error events or zero/non-finite BER: a
-    # 0-error point only upper-bounds the BER and must not be drawn as if it sat
-    # on the axis floor (this is what made the under-sampled coded-2-ASK
-    # reference appear to "diverge" above 6 dB), and a 2-7 error point is just
-    # Poisson noise that turbo-MC cannot economically refine at the tail.
-    keep = np.isfinite(ber) & (ber > 0.0) & (errs >= MIN_ERRS)
-    eb, ber, errs, bits = eb[keep], ber[keep], errs[keep], bits[keep]
-    if len(eb) == 0:
-        print(f"  skip {name}  (no measured nonzero-BER points)")
-        return None
-    if np.any(ber > 0.5):
-        print(f"  skip {name}  (BER > 0.5 — looks broken)")
-        return None
-    rise = (ber[1:] > ber[:-1] * MONO_TOL) & \
-           (ber[1:] > RELIABLE_BER) & (ber[:-1] > RELIABLE_BER)
-    if np.any(rise):
-        print(f"  skip {name}  (BER non-monotone in Eb/N0 — looks broken)")
-        return None
-    lo, hi = clopper_pearson(errs, bits)
-    return eb, ber, lo, hi
 
 
 def _new_panel():
@@ -202,22 +124,21 @@ def _plot_msprs_family(ax, family: str):
     # Each panel holds a single energy family, so the legend omits the
     # bal./unbal. tag (it is stated in the figure caption) and labels each
     # curve by L0 alone.
-    loaded = {L0: _sane(f"nsm_L{L0}_{family}_conv_K3_7iters",
-                        _load(f"nsm_L{L0}_{family}_conv_K3_7iters"))
+    loaded = {L0: load_curve(f"nsm_L{L0}_{family}_conv_K3_7iters")
               for L0 in (3, 4, 5, 6)}
     # A still-running sweep leaves the largest L0 with fewer Eb/N0 points; drop
     # any partial curve so the paper figure never ships a stubby line next to
     # the full ones. The longest curve in the family sets the bar; once a
     # lagging L0 catches up it renders automatically.
-    ref_n = max((len(d[0]) for d in loaded.values() if d is not None), default=0)
+    ref_n = max((len(d) for d in loaded.values() if d is not None), default=0)
     for L0 in (3, 4, 5, 6):
         d = loaded[L0]
         if d is None:
             continue
-        if len(d[0]) < ref_n:
-            print(f"  skip nsm_L{L0}_{family}  ({len(d[0])}/{ref_n} pts — incomplete)")
+        if len(d) < ref_n:
+            print(f"  skip nsm_L{L0}_{family}  ({len(d)}/{ref_n} pts — incomplete)")
             continue
-        eb, ber, lo, hi = d
+        eb, ber, lo, hi = d.eb_no_db, d.ber, d.ci_low, d.ci_high
         ax.errorbar(
             eb, ber, yerr=[ber - lo, hi - ber],
             color=_family_colour(family, L0),
@@ -252,10 +173,10 @@ def _plot_ldpc_family(ax, family: str):
     drawn = []
     for L0 in (3, 4):
         key = f"ldpc_msprs_L{L0}_{family}_turbo7"
-        d = _sane(key, _load(key))
+        d = load_curve(key)
         if d is None:
             continue
-        eb, ber, _lo, _hi = d
+        eb, ber = d.eb_no_db, d.ber
         ax.plot(eb, ber,
                 color=_family_colour(family, L0),
                 linestyle="--", marker=L0_MARKER[L0], markersize=3.4,
@@ -283,9 +204,9 @@ def _plot_benchmarks(ax, eb_th):
                 label="Uncoded 4-ASK (Gray)", linestyle="-.")
     plot_theory(ax, eb_th, ask4_theory(eb_th, gray=False), "uncoded_ref",
                 label="Uncoded 4-ASK (Natural)", linestyle=":")
-    d = _sane("ask2_conv_K3", _load("ask2_conv_K3"))
+    d = load_curve("ask2_conv_K3")
     if d is not None:
-        eb, ber, lo, hi = d
+        eb, ber, lo, hi = d.eb_no_db, d.ber, d.ci_low, d.ci_high
         ax.errorbar(eb, ber, yerr=[ber - lo, hi - ber],
                     color="#000000", linestyle="-",
                     marker="*", markersize=5, linewidth=1.2,
@@ -295,15 +216,15 @@ def _plot_benchmarks(ax, eb_th):
         ("ask4_gray_conv_K3_7iters",    "ask4_gray",    "Coded 4-ASK (Gray)",    "P"),
         ("ask4_natural_conv_K3_7iters", "ask4_natural", "Coded 4-ASK (Natural)", "X"),
     ]:
-        d = _sane(key, _load(key))
+        d = load_curve(key)
         if d is not None:
-            eb, ber, lo, hi = d
+            eb, ber, lo, hi = d.eb_no_db, d.ber, d.ci_low, d.ci_high
             kw = style_for(style)
             kw.update(marker=mk, markersize=3.5, label=lab)
             ax.errorbar(eb, ber, yerr=[ber - lo, hi - ber],
                         elinewidth=0.7, capsize=1.5, capthick=0.5, **kw)
-    # The binary FTN tau=0.5 curve was REMOVED on 2026-08-19. Its cache is
-    # honest data but of the wrong channel: nsm/modem/ftn.py normalises the
+    # The binary FTN tau=0.5 curve was removed on 2026-08-19 and its cache
+    # deleted on 2026-08-23. The data was of the wrong channel: nsm/modem/ftn.py normalises the
     # one-sided pulse autocorrelation to unit energy and drives it with white
     # noise, which pins the isolated-error distance to 4, the ISI-free 2-ASK
     # value, independently of tau. The true tau=0.5 MSED is 2.03, a 2.95 dB

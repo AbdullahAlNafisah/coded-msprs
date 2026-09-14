@@ -6,6 +6,7 @@
 #include "MSPRS/Modem_MSPRS.hpp"
 #include "MSPRS/NSC.hpp"
 #include "MSPRS/Bounds.hpp"
+#include "MSPRS/Dataset.hpp"
 #include "MSPRS/ExitSweep.hpp"
 #include "MSPRS/Eye.hpp"
 #include "MSPRS/LdpcSweep.hpp"
@@ -41,6 +42,7 @@ struct args
     std::string scheme;
     int         sps = 32, symbols = 3000;
     double      ebn0 = 15.11;
+    int         frames = 200;
 };
 
 args parse(int argc, char** argv)
@@ -78,6 +80,7 @@ args parse(int argc, char** argv)
         else if (s == "--sps"       && i + 1 < argc) a.sps      = std::stoi(next());
         else if (s == "--symbols"   && i + 1 < argc) a.symbols  = std::stoi(next());
         else if (s == "--ebn0"      && i + 1 < argc) a.ebn0     = std::stod(next());
+        else if (s == "--frames"    && i + 1 < argc) a.frames   = std::stoi(next());
         else { std::cerr << "unknown argument: " << s << "\n"; std::exit(2); }
     }
     return a;
@@ -332,6 +335,20 @@ int main(int argc, char** argv)
                     std::cout << s << " " << b0 << " " << b1 << " "
                               << tr.out[((size_t)s * 2 + b0) * 2 + b1] << " "
                               << tr.next[(size_t)s * 2 + b0] << "\n";
+        return 0;
+    }
+
+    if (a.mode == "dataset")
+    {
+        const auto pr = msprs::load_params(a.params);
+        const auto taps = msprs::load_taps(a.taps, a.L0, a.family);
+        msprs::DatasetConfig cfg;
+        cfg.bits = pr.source_bits; cfg.frames = a.frames; cfg.seed = a.seed;
+        cfg.ebn0_min = a.lo; cfg.ebn0_max = a.hi;
+        if (a.out.empty()) { std::cerr << "dataset needs --out\n"; return 2; }
+        msprs::mkdir_p(a.out);
+        const long long n = msprs::write_dataset(cfg, taps, a.out + "/X.bin", a.out + "/y.bin");
+        std::cout << "samples " << n << " features " << msprs::dataset_features(cfg) << "\n";
         return 0;
     }
 
